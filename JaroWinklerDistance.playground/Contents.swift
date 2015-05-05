@@ -1,19 +1,19 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 
 
 
@@ -83,7 +83,7 @@ class JaroDistance {
         // Limit the result to 4.
         return result > 4 ? 4 : result
     }
-
+    
     func getCommonPrefix(first: String, second: String) -> String {
         
         if first == "" {
@@ -105,7 +105,7 @@ class JaroDistance {
         }
         else {
             // we found a common initial character sequence
-
+            
             let str = first
             return str.substringWithRange(Range<String.Index>(start: str.startIndex, end: advance(str.startIndex, smallestIndexOfDiff)))
         }
@@ -149,7 +149,9 @@ class JaroDistance {
         }
         
         // Calculate the half length() distance of the shorter String.
-        let halfLength = Int(count(shorter)) / 2 + 1
+        let halfLength : Int = Int(ceil(Float(count(shorter)) / 2))
+        
+        println("half: \(halfLength)")
         
         // Find the set of matching characters between the shorter and longer strings. Note that
         // the set of matching characters may be different depending on the order of the strings.
@@ -198,13 +200,19 @@ class JaroDistance {
             let ch = String(Array(first)[i])
             
             // See if the character is within the limit positions away from the original position of that character.
-            for j in max(0, i - limit) ..< min(i + limit, count(second)) {
-                
-                if String(Array(copy)[j]) == ch {
-                    common = common + ch
-                    let nsRange : NSRange = NSRange(location: j, length: 1)
-                    let copy = (copy as NSString).stringByReplacingCharactersInRange(nsRange, withString: "*")
-                    break
+            
+            let jStart = max(0, i - limit)
+            let jEnd = min(i + limit, count(second))
+            
+            if jStart < jEnd {
+                for j in jStart ..< jEnd {
+                    
+                    if String(Array(copy)[j]) == ch {
+                        common = common + ch
+                        let nsRange : NSRange = NSRange(location: j, length: 1)
+                        let copy = (copy as NSString).stringByReplacingCharactersInRange(nsRange, withString: "*")
+                        break
+                    }
                 }
             }
         }
@@ -234,8 +242,8 @@ let d = jaro.getJaroWinklerDistance()
 println("distance : \(d)")   // distance: 0.9611
 
 
-let jaro1 = JaroDistance(firstString: "DWAYNE", lastString: "DUANE")
+let jaro1 = JaroDistance(firstString: "Hello", lastString: "hey")
 let d1 = jaro1.getJaroWinklerDistance()
-println("distance : \(d1)") // distance: 0.84
+println("distance : \(d1)") // distance: 0.688
 
 
