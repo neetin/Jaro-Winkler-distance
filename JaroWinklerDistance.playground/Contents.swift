@@ -42,28 +42,19 @@ extension String {
     }
 }
 
-
 class JaroDistance {
-    
-    var firstString = ""
-    var lastString = ""
     
     let INDEX_NOT_FOUND = -1
     let EMPTY = ""
     let SPACE = " "
     
-    init(firstString: String, lastString: String) {
-        self.firstString = firstString
-        self.lastString = lastString
-    }
     
-    
-    func getJaroWinklerDistance() -> Float {
+    func getJaroWinklerDistance(#firstWord : String, secondWord : String) -> Float {
         
         let defaultScalingFactor : Float = 0.1
         
-        let jaro = Float(self.score())
-        let cp = Float(self.commonPrefixLength(first: self.firstString, second: self.lastString))
+        let jaro = Float(self.score(firstString: firstWord, secondString: secondWord))
+        let cp = Float(self.commonPrefixLength(first: firstWord, second: secondWord))
         
         let matchScore : Float = jaro + defaultScalingFactor * Float(cp) * Float(1 - jaro)
         return matchScore
@@ -133,25 +124,23 @@ class JaroDistance {
         return INDEX_NOT_FOUND
     }
     
-    func score() -> Float {
+    func score(#firstString : String, secondString : String) -> Float {
         
         var shorter : String!
         var longer : String!
         
         // Determine which String is longer.
-        if count(self.firstString) > count(self.lastString) {
-            longer = self.firstString.lowercaseString
-            shorter = self.lastString.lowercaseString
+        if count(firstString) > count(secondString) {
+            longer = firstString.lowercaseString
+            shorter = secondString.lowercaseString
         }
         else {
-            longer = self.lastString.lowercaseString
-            shorter = self.firstString.lowercaseString
+            longer = secondString.lowercaseString
+            shorter = firstString.lowercaseString
         }
         
         // Calculate the half length() distance of the shorter String.
-        let halfLength : Int = Int(ceil(Float(count(shorter)) / 2))
-        
-        println("half: \(halfLength)")
+        let halfLength = Int(count(shorter)) / 2 + 1
         
         // Find the set of matching characters between the shorter and longer strings. Note that
         // the set of matching characters may be different depending on the order of the strings.
@@ -200,13 +189,11 @@ class JaroDistance {
             let ch = String(Array(first)[i])
             
             // See if the character is within the limit positions away from the original position of that character.
-            
             let jStart = max(0, i - limit)
             let jEnd = min(i + limit, count(second))
             
             if jStart < jEnd {
                 for j in jStart ..< jEnd {
-                    
                     if String(Array(copy)[j]) == ch {
                         common = common + ch
                         let nsRange : NSRange = NSRange(location: j, length: 1)
@@ -237,13 +224,11 @@ class JaroDistance {
 }
 
 
-let jaro = JaroDistance(firstString: "martha", lastString: "marhta")
-let d = jaro.getJaroWinklerDistance()
+let jaro = JaroDistance()
+let d = jaro.getJaroWinklerDistance(firstWord: "martha", secondWord: "marhta")
 println("distance : \(d)")   // distance: 0.9611
 
-
-let jaro1 = JaroDistance(firstString: "Hello", lastString: "hey")
-let d1 = jaro1.getJaroWinklerDistance()
+let d1 = jaro.getJaroWinklerDistance(firstWord: "Hello", secondWord: "hey")
 println("distance : \(d1)") // distance: 0.688
 
 
